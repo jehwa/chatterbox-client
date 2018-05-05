@@ -27,7 +27,9 @@ app.init = () => {
     app.fetch();
   });
    
-    
+  $('#roomSelect').on('click', this, function() {
+    app.fetch(cb)
+  }); 
 };
 
 app.send = (message) => {
@@ -48,7 +50,7 @@ app.send = (message) => {
   
 };
 
-app.fetch = () => {
+app.fetch = (callback) => {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
@@ -66,6 +68,7 @@ app.fetch = () => {
           uniqObj[eachMessage.roomname] = true;
           app.renderRoom(eachMessage);
         }
+        
         app.renderMessage(eachMessage);
       });
     },
@@ -94,19 +97,11 @@ app.renderRoom = (message) => {
   $('#roomSelect').append(room);
 };
 
-var message = {
-  username: 'Mel Brooks',
-  text: 'It\'s good to be the king',
-  roomname: 'lobby'
-};
-
 app.handleUsernameClick = () => {
   console.log('hi');
 };
 
 app.handleSubmit = () => {
-  // var newMessage = $('<div class="inputMessage"><div>').text($('#send').val());
-  // $('#chats').append(newMessage);
   
   var message = {
     username: 'default',
@@ -137,8 +132,10 @@ app.getMessage = () => {
   return $('#send').val();
 };
 
-app.getRoom = () => {
-  
+app.renderMessageByRoom = (message, roomName) => {
+  if(message.roomname === roomName) {
+    app.renderMessage(message);
+  }
 };
 
 
