@@ -1,5 +1,7 @@
 // YOUR CODE HERE:
-var app = {};
+var app = {
+  currentRoom: 'lobby',
+};
 
 
 $(document).ready(function(){
@@ -16,7 +18,10 @@ app.init = () => {
   
   $(document).on('click', '.username',function(e) {
     e.preventDefault();
-    app.handleUsernameClick();  
+    console.log($(this).text())
+    var $className = $(this).text();
+    $('.'+$className).addClass('friend')
+
   });
   
   $('.submit').on('click', function(e) {
@@ -25,13 +30,17 @@ app.init = () => {
   });
   
   $('button').on('click', function(e) {
+    e.preventDefault();
     app.fetch(app.renderMessage);
   });
    
-  $('#roomSelect').on('click', this, function() {
-    //app.fetch(app.renderRoom)
+  $('select').on('change', function(e) {
+    e.preventDefault();
+    app.currentRoom = $(this).val();
+    app.fetch(app.renderMessageByRoom, app.currentRoom);
   }); 
 };
+
 
 app.send = (message) => {
   $.ajax({
@@ -51,7 +60,7 @@ app.send = (message) => {
   
 };
 
-app.fetch = (callback) => {
+app.fetch = (callback, arg) => {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
@@ -63,19 +72,8 @@ app.fetch = (callback) => {
       console.log('chatterbox: Message received');
       console.log(data);
       app.clearMessages()
-      callback(data.results);
-      // var uniqObj = {};
-      // data.results.forEach(function(eachMessage){
-      //   app.clearMessages()
-      //   if(!uniqObj[eachMessage.roomname] && eachMessage.roomname) {
-      //     uniqObj[eachMessage.roomname] = true;
-      //     callback(eachMessage);
-      //   }
-        
-      //   // if(callback === )
-        
-      //   // callback(eachMessage);
-      // });
+      callback(data.results, arg);
+
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -92,7 +90,8 @@ app.clearMessages = function() {
 app.renderMessage = (message) => {
   message.forEach(function(eachMessage){
     var username = $('<a href="#" class="username"></a>').text(eachMessage.username);
-    var messageText = $('<div></div>').text(eachMessage.text);
+    var messageText = $('<div></div>').text(eachMessage.text).addClass(eachMessage.username);
+    
     $('#chats').append(username);
     $('#chats').append(messageText);
     
@@ -105,14 +104,14 @@ app.renderRoom = (message) => {
   message.forEach(function(eachMessage){
     if(!uniqueRooms[eachMessage.roomname] && eachMessage.roomname) {
       uniqueRooms[eachMessage.roomname] = true;
-      var room = $('<option class="roomName"></option>').text(eachMessage.roomname);
+      var room = $('<option class=' + eachMessage.roomname +'></option>').text(eachMessage.roomname);
       $('#roomSelect').append(room);
     }
   });
 };
 
-app.handleUsernameClick = () => {
-  console.log('hi');
+app.handleUsernameClick = (username) => {
+  
 };
 
 app.handleSubmit = () => {
@@ -124,9 +123,10 @@ app.handleSubmit = () => {
   };
   message.username = app.getUsername();
   message.text = app.getMessage();
+  message.roomname = app.currentRoom;
   app.clearMessages();
   app.send(message);
-  app.fetch(app.renderMessage);
+  app.fetch(app.renderMessageByRoom, app.currentRoom);
 };
 
 app.getUsername = () => {
@@ -146,11 +146,14 @@ app.getMessage = () => {
   return $('#send').val();
 };
 
-app.renderMessageByRoom = (message, roomName) => {
-  if(message.roomname === roomName) {
-    app.renderMessage(message);
-  }
+
+app.renderMessageByRoom = (message, currentRoom) => {
+  var filteredRoom = message.filter(function(eachMessage){
+    return eachMessage.roomname === currentRoom;
+  });
+  app.renderMessage(filteredRoom);
 };
+
 
 
 
