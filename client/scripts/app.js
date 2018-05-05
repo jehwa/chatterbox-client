@@ -4,6 +4,7 @@ var app = {};
 
 $(document).ready(function(){
   app.init();
+  app.fetch();
 });
 
 
@@ -58,8 +59,13 @@ app.fetch = () => {
       
       console.log('chatterbox: Message received');
       console.log(data);
+      var uniqObj = {};
       data.results.forEach(function(eachMessage){
         //app.clearMessages()
+        if(!uniqObj[eachMessage.roomname] && eachMessage.roomname) {
+          uniqObj[eachMessage.roomname] = true;
+          app.renderRoom(eachMessage);
+        }
         app.renderMessage(eachMessage);
       });
     },
@@ -84,7 +90,7 @@ app.renderMessage = (message) => {
 };
 
 app.renderRoom = (message) => {
-  var room = $('<div class="roomName"></div>').text(message.roomname);
+  var room = $('<option class="roomName"></option>').text(message.roomname);
   $('#roomSelect').append(room);
 };
 
@@ -115,7 +121,16 @@ app.handleSubmit = () => {
 };
 
 app.getUsername = () => {
-  return window.location.search.substring(10);
+  var username = window.location.search.substring(10).split('');
+  //debugger;
+  for(let i = 0; i < username.length; i ++) {
+    if(username[i] === '%') {
+      username.splice(i, 3, ' ');
+      console.log(username);
+    }
+  }
+  return username.join('');
+  // console.log(username);
 };
 
 app.getMessage = () => {
@@ -125,6 +140,7 @@ app.getMessage = () => {
 app.getRoom = () => {
   
 };
+
 
 
 
