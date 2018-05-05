@@ -4,7 +4,8 @@ var app = {};
 
 $(document).ready(function(){
   app.init();
-  app.fetch();
+  app.fetch(app.renderRoom);
+  app.fetch(app.renderMessage);
 });
 
 
@@ -20,15 +21,15 @@ app.init = () => {
   
   $('.submit').on('click', function(e) {
     e.preventDefault();
-    app.handleSubmit();
+    app.fetch(app.handleSubmit);
   });
   
   $('button').on('click', function(e) {
-    app.fetch();
+    app.fetch(app.renderMessage);
   });
    
   $('#roomSelect').on('click', this, function() {
-    app.fetch(cb)
+    //app.fetch(app.renderRoom)
   }); 
 };
 
@@ -61,16 +62,20 @@ app.fetch = (callback) => {
       
       console.log('chatterbox: Message received');
       console.log(data);
-      var uniqObj = {};
-      data.results.forEach(function(eachMessage){
-        //app.clearMessages()
-        if(!uniqObj[eachMessage.roomname] && eachMessage.roomname) {
-          uniqObj[eachMessage.roomname] = true;
-          app.renderRoom(eachMessage);
-        }
+      app.clearMessages()
+      callback(data.results);
+      // var uniqObj = {};
+      // data.results.forEach(function(eachMessage){
+      //   app.clearMessages()
+      //   if(!uniqObj[eachMessage.roomname] && eachMessage.roomname) {
+      //     uniqObj[eachMessage.roomname] = true;
+      //     callback(eachMessage);
+      //   }
         
-        app.renderMessage(eachMessage);
-      });
+      //   // if(callback === )
+        
+      //   // callback(eachMessage);
+      // });
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -85,16 +90,25 @@ app.clearMessages = function() {
 };
 
 app.renderMessage = (message) => {
-  var username = $('<a href="#" class="username"></a>').text(message.username);
-  var messageText = $('<div></div>').text(message.text);
-  $('#chats').append(username);
-  $('#chats').append(messageText);
+  message.forEach(function(eachMessage){
+    var username = $('<a href="#" class="username"></a>').text(eachMessage.username);
+    var messageText = $('<div></div>').text(eachMessage.text);
+    $('#chats').append(username);
+    $('#chats').append(messageText);
+    
+  });
   
 };
 
 app.renderRoom = (message) => {
-  var room = $('<option class="roomName"></option>').text(message.roomname);
-  $('#roomSelect').append(room);
+  var uniqueRooms = {};
+  message.forEach(function(eachMessage){
+    if(!uniqueRooms[eachMessage.roomname] && eachMessage.roomname) {
+      uniqueRooms[eachMessage.roomname] = true;
+      var room = $('<option class="roomName"></option>').text(eachMessage.roomname);
+      $('#roomSelect').append(room);
+    }
+  });
 };
 
 app.handleUsernameClick = () => {
@@ -112,7 +126,7 @@ app.handleSubmit = () => {
   message.text = app.getMessage();
   app.clearMessages();
   app.send(message);
-  app.fetch();
+  app.fetch(app.renderMessage);
 };
 
 app.getUsername = () => {
@@ -137,6 +151,7 @@ app.renderMessageByRoom = (message, roomName) => {
     app.renderMessage(message);
   }
 };
+
 
 
 
