@@ -12,16 +12,17 @@ $(document).ready(function(){
 app.init = () => {
   
   
-  $('.username').on('click', function() {
-    console.log(this);
+  $(document).on('click', '.username',function(e) {
+    e.preventDefault();
     app.handleUsernameClick();  
   });
   
-  $('.submit').on('click', function() {
+  $('.submit').on('click', function(e) {
+    e.preventDefault();
     app.handleSubmit();
   });
   
-  $('.refresh').on('click', function() {
+  $('button').on('click', function(e) {
     app.fetch();
   });
    
@@ -52,9 +53,11 @@ app.fetch = () => {
     url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
     type: 'GET',
     dataType: 'json',
+    data: 'order=-createdAt',
     success: (data) => {
-      console.log(data);
+      
       console.log('chatterbox: Message received');
+      console.log(data);
       data.results.forEach(function(eachMessage){
         //app.clearMessages()
         app.renderMessage(eachMessage);
@@ -69,7 +72,7 @@ app.fetch = () => {
 };
 
 app.clearMessages = function() {
-  $('#chats').children().remove();
+  $('#chats').html('');
 };
 
 app.renderMessage = (message) => {
@@ -92,7 +95,7 @@ var message = {
 };
 
 app.handleUsernameClick = () => {
- console.log('hi');
+  console.log('hi');
 };
 
 app.handleSubmit = () => {
@@ -106,7 +109,7 @@ app.handleSubmit = () => {
   };
   message.username = app.getUsername();
   message.text = app.getMessage();
-  app.renderMessage(message);
+  app.clearMessages();
   app.send(message);
   app.fetch();
 };
