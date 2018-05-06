@@ -1,4 +1,3 @@
-// YOUR CODE HERE:
 var app = {
   currentRoom: 'lobby',
 };
@@ -18,9 +17,8 @@ app.init = () => {
   
   $(document).on('click', '.username',function(e) {
     e.preventDefault();
-    console.log($(this).text())
     var $className = $(this).text();
-    $('.'+$className).addClass('friend')
+    $('.'+$className).toggleClass('friend')
 
   });
   
@@ -28,6 +26,23 @@ app.init = () => {
     e.preventDefault();
     app.fetch(app.handleSubmit);
   });
+  $('.submitRoom').on('click', function(e){
+    e.preventDefault();
+    
+    var message = {
+    username: 'default',
+    text: undefined,
+    roomname: 'lobby'
+    };
+    
+    message.username = app.getUsername();
+    message.roomname = $('#addRoom').val();
+    
+    app.send(message);
+    app.fetch(app.renderMessage);
+    app.fetch(app.renderRoom);
+    
+  })
   
   $('button').on('click', function(e) {
     e.preventDefault();
@@ -38,13 +53,13 @@ app.init = () => {
     e.preventDefault();
     app.currentRoom = $(this).val();
     app.fetch(app.renderMessageByRoom, app.currentRoom);
+    
   }); 
 };
 
 
 app.send = (message) => {
   $.ajax({
-    // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
     type: 'POST',
     data: JSON.stringify(message),
@@ -53,7 +68,6 @@ app.send = (message) => {
       console.log('chatterbox: Message sent');
     },
     error: (data) => {
-      // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
       console.error('chatterbox: Failed to send message', data);
     }
   });
@@ -62,7 +76,6 @@ app.send = (message) => {
 
 app.fetch = (callback, arg) => {
   $.ajax({
-    // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
     type: 'GET',
     dataType: 'json',
@@ -70,13 +83,11 @@ app.fetch = (callback, arg) => {
     success: (data) => {
       
       console.log('chatterbox: Message received');
-      console.log(data);
       app.clearMessages()
       callback(data.results, arg);
 
     },
     error: function (data) {
-      // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
       console.error('chatterbox: Failed to get message', data);
       
     }
@@ -89,15 +100,18 @@ app.clearMessages = function() {
 
 app.renderMessage = (message) => {
   message.forEach(function(eachMessage){
-    var username = $('<a href="#" class="username"></a>').text(eachMessage.username);
-    var messageText = $('<div></div>').text(eachMessage.text).addClass(eachMessage.username);
-    
-    $('#chats').append(username);
-    $('#chats').append(messageText);
+    if(!JSON.stringify(eachMessage).includes('<', '>', '&', '%', '\"', '\'')) {    
+      var username = $('<a href="#" class="username"></a>').text(eachMessage.username);
+      var messageText = $('<div class="messages"></div>').text(eachMessage.text).addClass(eachMessage.username);
+      
+      $('#chats').append(username);
+      $('#chats').append(messageText);
+    }
     
   });
   
 };
+
 
 app.renderRoom = (message) => {
   var uniqueRooms = {};
@@ -108,10 +122,6 @@ app.renderRoom = (message) => {
       $('#roomSelect').append(room);
     }
   });
-};
-
-app.handleUsernameClick = (username) => {
-  
 };
 
 app.handleSubmit = () => {
@@ -131,15 +141,12 @@ app.handleSubmit = () => {
 
 app.getUsername = () => {
   var username = window.location.search.substring(10).split('');
-  //debugger;
   for(let i = 0; i < username.length; i ++) {
     if(username[i] === '%') {
       username.splice(i, 3, ' ');
-      console.log(username);
     }
   }
   return username.join('');
-  // console.log(username);
 };
 
 app.getMessage = () => {

@@ -1,5 +1,5 @@
 body {
-    background: #eee;
+    background: #EAF2F8;
     text-align: center;
     padding: 0 25px;
     font-family: arial, sans-serif;
@@ -9,13 +9,13 @@ body {
     width: 500px;
     margin: auto;
     text-align: left;
-    background: white;
+    background: ;
     padding: 50px 60px;
-    border: solid #ddd;
     border-width: 0 1px 1px 1px;
 }
 
 #main h1 {
+    text-align: center;
     margin-top: 0;
     font-size: 35px;
     margin-bottom: 5px;
@@ -24,10 +24,12 @@ body {
 
 #main h1 span {
     font-style:italic;
+    text-align: center;
 }
 
 #main ul {
     padding-left: 20px;
+    
 }
 
 #main .error {
@@ -59,14 +61,42 @@ form input[type=text] {
     padding: 5px;
 }
 
-.chat {
-    padding: 5px;
-    margin-bottom: 5px;
-    background-color: #eee;
+.roomTitle {
+    text-align: left;
+    margin-bottom: 20px;
+    margin-left: 30px;
+    float: left;
+    
+}
+#roomSelect {
+    margin-bottom: 20px;
+    margin-right: 40px;
+    /*float: left;*/
 }
 
-.chat .username {
+select {
+    background: #1F618D;
+    color: white;
+}
+
+#chats {
+    padding: 5px;
+    margin-bottom: 20px;
+    background-color: #D4E6F1;
+}
+
+#chats .username {
     font-weight: 800;
+    text-decoration: none;
+    color: #154360;
+}
+button input {
+    background-color: #1F618D;
+    color: white;
+    border: none;
+}
+.messages {
+    margin-bottom: 10px;
 }
 
 .chat:hover {
